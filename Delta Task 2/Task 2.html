@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Delta task 2</title>
+<link rel="icon" type="image/ico" href="favicon.ico">
+<style>
+canvas {
+    border: 10px solid #cccccc;
+    background-color: #000000;
+    margin-top: 20px;
+    margin-left: 450px;
+    display: block;
+}
+button{
+padding: 15px 32px;
+text-align: center;
+text-decoration: none;
+font-size: 16px;
+margin: 4px 2px;
+cursor: pointer;
+display: block;
+
+}
+div{
+ display: none;       
+    }
+</style>
+</head>
+<body onload="startGame()">
+<center><p style = "text-align:center; font-size: 40px">MAZE OUT</p>
+<p style = "text-align:center; font-size: 30px; display: inline">SCORE: </p>
+<p id="demo" style = "text-align:center; font-size: 30px; display: inline"></p>
+<div id = "work">
+<br>    
+<h1>GAME OVER</h1>
+<img src="face.jpg">
+<br>
+<button onclick = "restart()">Restart</button>    
+<br>
+</div>
+</center>
+<script>
+var myGamePiece;
+var myObstacles = [];
+var mybt;
+var mybl;
+var mybr;
+var mybb;
+var mySound;
+var myMusic;
+function restart(){
+    location.reload();
+}
+function startGame() {
+    myGameArea.start();
+    mybt = new component(600, 10, "red", 0, 0);
+    mybl = new component(10, 400, "red", 0, 0);
+    mybr = new component(10, 400, "red", 590, 0);
+    mybb = new component(600, 10, "red", 0, 390);
+    myPlayer = new player(20,20);
+    mySound = new sound("bounce.mp3");
+    myMusic = new sound("music.mp3");
+    myMusic.play();
+}
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 600;
+        this.canvas.height = 400;
+        this.context = this.canvas.getContext("2d");
+        this.canvas.style.cursor = "none";
+        document.body.insertBefore(this.canvas, document.body.childNodes[-1]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 5);
+        window.addEventListener('mousemove', function (e) {
+            myGameArea.x = e.pageX - 460;
+            myGameArea.y = e.pageY - 200;
+        })
+    },
+    clear : function(){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        },
+    stop : function() {
+        clearInterval(this.interval);
+        }
+    
+}
+function player(a,b){
+this.x = a;
+this.y = b;
+this.update1 = function(){
+c = myGameArea.context;
+c.beginPath();
+c.fillStyle = "#ffff66";
+c.arc(this.x, this.y, 10, 0, Math.PI*2, true);
+c.fill();
+}
+
+this.crashWith = function(otherobj) {
+        var myleft = this.x - 4;
+        var myright = this.x + 4;
+        var mytop = this.y - 4;
+        var mybottom = this.y + 4;
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+		
+        return crash;
+    }
+}
+function component(width, height, color, x, y) {
+    this.width = width;
+    this.height = height;
+    this.x = x;
+    this.y = y;    
+    ctx = myGameArea.context;
+    this.update2 = function() {
+        ctx = myGameArea.context;
+        ctx.fillStyle = color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+}
+}
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    return false;
+}
+function updateGameArea(){
+    var x, y, height, width,n;
+    for (i = 0; i < myObstacles.length; i += 1) {
+        if (myPlayer.crashWith(myObstacles[i])) {
+            mySound.play();
+            myMusic.stop();
+            myGameArea.stop();
+            gameover();
+            return;
+        } 
+    }
+	if(myGameArea.y>myGameArea.canvas.height - 5){
+	myGameArea.y = myGameArea.canvas.height - 5;
+	
+	}
+	if(myGameArea.y<5){
+	myGameArea.y = 5;
+	
+	}
+	if(myGameArea.x>myGameArea.canvas.width - 5){
+	myGameArea.x = myGameArea.canvas.width - 5;
+	
+	}
+    if(myGameArea.x<5){
+	myGameArea.x = 5;
+    }
+    myGameArea.clear();
+    myGameArea.frameNo += 1;
+    if (myGameArea.frameNo == 1 || everyinterval(100)) {
+        x = myGameArea.canvas.width;
+        y = myGameArea.canvas.height * Math.random();
+        height = 400 * Math.random();
+        width = 30 * Math.random();
+        myObstacles.push(new component(width, height, "green", x, y));
+    }
+    for (i = 0; i < myObstacles.length; i += 1) {
+        myObstacles[i].x += -1;
+        myObstacles[i].update2();
+    }
+    if (myGameArea.x && myGameArea.y) {
+        myPlayer.x = myGameArea.x;
+        myPlayer.y = myGameArea.y;        
+    }
+    myPlayer.update1();
+    mybt.update2();
+    mybl.update2();
+    mybr.update2();
+    mybb.update2();
+        
+var v = document.getElementById("demo");
+v.innerHTML = myGameArea.frameNo;    
+
+}
+function gameover(){
+    var t = document.getElementById("work")
+    t.style.display = "block";
+} 
+function sound(src){
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }    
+}
+</script>
+</body>
+</html>
