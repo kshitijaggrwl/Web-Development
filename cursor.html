@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Delta task 2</title>
+<link rel="icon" type="image/ico" href="favicon.ico">
+<style>
+canvas {
+    border: 10px solid #cccccc;
+    background-color: #000000;
+    display: block;
+}
+}
+</style>
+</head>
+<body onload="startGame()">
+<script>
+function startGame() {
+    myGameArea.start();
+    myGamePiece = new player(20,20);
+}
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 600;
+        this.canvas.height = 400;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 5);
+        window.addEventListener('mousemove', function (e) {
+            myGameArea.x = e.pageX;
+            myGameArea.y = e.pageY;
+        })
+    },
+    clear : function(){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+}
+function player(a,b){
+this.x = a;
+this.y = b;
+this.update1 = function(){
+c = myGameArea.context;
+c.beginPath();
+c.fillStyle = "#ffff66";
+c.arc(this.x, this.y, 10, 0, Math.PI*2, true);
+c.fill();
+}
+}
+function updateGameArea(){
+if (myGameArea.x && myGameArea.y) {
+        var dx = myGameArea.x - myGamePiece.x;
+        var dy = myGameArea.y - myGamePiece.y;
+        if(dx==0)
+        {
+            if(dy>0){myGamePiece.y = myGamePiece.y + 2;}
+            else{myGamePiece.y = myGamePiece.y - 2;}
+            myGamePiece.x = myGameArea.x;
+        }
+        if(dy==0)
+        {
+            if(dx>0){myGamePiece.x = myGamePiece.x + 2;}
+            else{myGamePiece.x = myGamePiece.x - 2;}
+            myGamePiece.y = myGameArea.y;
+        }
+        else
+        {var rad = Math.atan(Math.abs(dy/dx));
+        if(dx<0)
+        {myGamePiece.x = myGamePiece.x - (2*Math.cos(rad));}
+        else
+        {myGamePiece.x = myGamePiece.x + (2*Math.cos(rad));}    
+        if(dy<0)
+        {myGamePiece.y = myGamePiece.y - (2*Math.cos(rad));}
+        else
+        {myGamePiece.y = myGamePiece.y + (2*Math.cos(rad));}}
+}
+    
+    myGameArea.clear();
+    myGamePiece.update1();
+}
+</script>
+</body>
+</html>
