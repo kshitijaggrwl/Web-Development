@@ -1,0 +1,10 @@
+CREATE TABLE events(
+    event_id int(11) not null AUTO_INCREMENT PRIMARY KEY,
+    event_title varchar(256) not null,
+    event_startd varchar(256) not null,
+    event_startt varchar(256) not null,
+    event_endd varchar(256) not null,
+    event_endt varchar(256) not null,
+    event_des varchar(256) not null,
+    event_user varchar(256) not null,
+    );
